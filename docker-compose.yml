@@ -1,0 +1,30 @@
+version: '2'
+services:
+    mongodb:
+        image: mongo:3.2.6
+        ports:
+            - "27017:27017"        
+
+    mongo-seed:
+        image: mongo:3.2.6
+        links:
+            - mongodb
+        volumes:
+            - ./data/:/polldata
+                
+        command:
+            'sh -c "mongoimport --host mongodb --db "doodle" --collection "polls" --type json --file "/polldata/polls" --jsonArray"'
+
+    mongo-createindex:
+        image: mongo:3.2.6
+        links:
+            - mongodb
+        command:
+            mongo --host mongodb doodle --eval 'db.polls.createIndex({"$$**":"text"})'
+
+    webserver:
+        build: .
+        ports:
+            - "8080:8080"
+        links:
+            - mongodb
