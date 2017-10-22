@@ -14,4 +14,7 @@ docker run -d -p 27017:27017 mymongo
 #Import polls to running mongo database
 mongoimport --db "doodle" --collection "polls" --type json --file "polls" --jsonArray
 
+#Create index on Polls collection - this is needed for FullText search to work
+mongo doodle --eval 'db.polls.createIndex({"$**":"text"})'
+
 #Downside of this approach is that user has to have installed mongo and mongoimport on target machine !!!
